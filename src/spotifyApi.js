@@ -50,7 +50,7 @@ export const getLikedSongs = (token) => {
   getAllTracks()
     .then((tracks) => {
       console.log(tracks);
-      // do something with the songs
+      return getAllTracks()
     })
     .catch((error) => console.log(error));
 };

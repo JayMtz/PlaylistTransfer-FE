@@ -8,6 +8,8 @@ function App() {
   const [isSpotifyLoggedIn, setIsSpotifyLoggedIn] = useState(false);
   const [spotifyToken, setSpotifyToken] = useState(null)
 
+  const [tracks, setTracks] = useState([]);
+
   // This useEffect hook checks for the Spotify token in the URL when the app first loads.
   // If the token is present, it sets the token state and sets the isSpotifyLoggedIn state to true.
   useEffect(() => {
@@ -25,6 +27,8 @@ function App() {
     getLikedSongs(spotifyToken);
   };
   
+
+  
   return (
     <div className='App'>
       <div style={
@@ -35,15 +39,15 @@ function App() {
         alignItems: 'center' 
         }}>
 
-     <button style ={spotifyButton} onClick = {handleSpotifyAuth}>
-      spotifyAuth
+     <button style ={spotifyButton}  onClick = {handleSpotifyAuth}>
+      Click here to Authorize your Spotify account
      </button>
      {isSpotifyLoggedIn && (
         <div style={{ position: 'absolute', bottom: '0', width: '100%' }}>
-          <button style={appleButton} onClick = {handleGetLikedSongs}>get liked songs</button>
+          <button style={spotifyButton}  onClick = {handleGetLikedSongs}>get liked songs</button>
         </div>
       )}
-      
+    
      </div>
     </div>
   )
