@@ -1,71 +1,30 @@
 import './App.css';
 import React, { useEffect, useState } from 'react';
 import { appleButton, spotifyButton } from './styles';
-import SpotifyWebApi from 'spotify-web-api-js';
+//import SpotifyWebApi from 'spotify-web-api-js';
+import { getSpotifyTokenFromUrl, getLikedSongs, handleSpotifyAuth } from './spotifyApi';
 
-const spotifyApi = new SpotifyWebApi();
 function App() {
   const [isSpotifyLoggedIn, setIsSpotifyLoggedIn] = useState(false);
   const [spotifyToken, setSpotifyToken] = useState(null)
 
-  useEffect( () =>{
+  // This useEffect hook checks for the Spotify token in the URL when the app first loads.
+  // If the token is present, it sets the token state and sets the isSpotifyLoggedIn state to true.
+  useEffect(() => {
     const token = getSpotifyTokenFromUrl();
-    if (token){
-      setSpotifyToken(token)
+    if (token) {
+      setSpotifyToken(token);
       setIsSpotifyLoggedIn(true);
-      console.log(token)
+      console.log(token);
     }
-  }
-  );
+  }, []);
 
-  const handleSpotifyAuth = () => {
-    const authEndpoint = 'https://accounts.spotify.com/authorize';
-    const clientId ='8f294d8899f94e34b7690db17fe12fc9';
-    const scopes = ['user-library-read'];
-    const redirectUri = 'http://localhost:3000/callback/';
-    const authUrl = `${authEndpoint}?client_id=${clientId}&redirect_uri=${redirectUri}&scope=${scopes.join('%20')}&response_type=token&show_dialog=true`;
-    window.location = authUrl;
-    setIsSpotifyLoggedIn(true);
-    //???kkk
-    
-    
-  }
-  
-  const getSpotifyTokenFromUrl = () =>{
-    const hash = window.location.hash;
-    const token = hash.substring(1).split('&')[0].split('=')[1];
-    return token
-  }
-
-  const getLikedSongs = () => {
-    const token = getSpotifyTokenFromUrl();
-    spotifyApi.setAccessToken(token);
-  
-    const getAllTracks = async (offset = 0) => {
-      const response = await spotifyApi.getMySavedTracks({ offset });
-      const tracks = response.items.map(item => ({
-        name: item.track.name,
-        artist: item.track.artists[0].name
-      }));
-  
-      if (response.next) {
-        // recursively get the next page of tracks
-        const nextTracks = await getAllTracks(offset + response.limit);
-        return [...tracks, ...nextTracks];
-      }
-  
-      return tracks;
-    };
-  
-    getAllTracks()
-      .then(tracks => {
-        console.log(tracks);
-        // do something with the songs
-      })
-      .catch(error => console.log(error));
+  // This function is called when the "Get Liked Songs" button is clicked.
+  // It calls the getLikedSongs function with the Spotify token to retrieve the user's liked songs.
+  const handleGetLikedSongs = () => {
+    getLikedSongs(spotifyToken);
   };
   
-
   return (
     <div className='App'>
       <div style={
@@ -81,16 +40,13 @@ function App() {
      </button>
      {isSpotifyLoggedIn && (
         <div style={{ position: 'absolute', bottom: '0', width: '100%' }}>
-          <button style={appleButton} onClick = {getLikedSongs}>get liked songs</button>
+          <button style={appleButton} onClick = {handleGetLikedSongs}>get liked songs</button>
         </div>
       )}
       
-      
-
      </div>
     </div>
   )
-      };
-
+};
 
 export default App;
