@@ -49,8 +49,21 @@ export const getLikedSongs = (token) => {
   // call the getAllTracks function and log the tracks to the console
   getAllTracks()
     .then((tracks) => {
-      console.log(tracks);
-      return getAllTracks()
+      console.log(tracks); // log the tracks to the console for debugging purposes
+      // send the tracks to the backend endpoint using fetch
+      fetch('https://reqres.in/api/users', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(tracks),
+      })
+        .then((response) => {
+          console.log('Data sent successfully:', response);
+        })
+        .catch((error) => {
+          console.error('Error sending data:', error);
+        });
     })
     .catch((error) => console.log(error));
 };
