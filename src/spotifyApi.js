@@ -7,12 +7,13 @@ export const handleSpotifyAuth = () => {
   // set up the authentication endpoint, client ID, scopes, redirect URI, and URL to open for authentication
   const authEndpoint = 'https://accounts.spotify.com/authorize';
   const clientId = '8f294d8899f94e34b7690db17fe12fc9';
-  const scopes = ['user-library-read'];
+  const scopes = ['user-library-read', 'playlist-modify-public', 'playlist-modify-private'];
   const redirectUri = 'http://localhost:3000/callback/';
   const authUrl = `${authEndpoint}?client_id=${clientId}&redirect_uri=${redirectUri}&scope=${scopes.join('%20')}&response_type=token&show_dialog=true`;
   // open the URL to authenticate the user
   window.location = authUrl;
-};
+}
+
 
 // function to get the Spotify access token from the URL
 export const getSpotifyTokenFromUrl = () => {
