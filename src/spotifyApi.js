@@ -13,8 +13,6 @@ export const handleSpotifyAuth = () => {
   // open the URL to authenticate the user
   window.location = authUrl;
 }
-
-
 // function to get the Spotify access token from the URL
 export const getSpotifyTokenFromUrl = () => {
   const hash = window.location.hash;
@@ -68,3 +66,26 @@ export const getLikedSongs = (token) => {
     })
     .catch((error) => console.log(error));
 };
+
+// function to create a new public playlist for the user
+// function to create a new playlist
+export const createPlaylist = async (token) => {
+  // set the access token for the SpotifyWebApi instance
+  spotifyApi.setAccessToken(token);
+  try {
+    // get the user ID
+    const { id } = await spotifyApi.getMe();
+    console.log('User ID:', id);
+    
+    // create the new playlist with the name "testplaylist" and set it to be private
+    const response = await spotifyApi.createPlaylist(id, {
+      name: 'Apple Music songs',
+      public: false
+    });
+    console.log('Playlist created:', response);
+  } catch (error) {
+    console.log('Error creating playlist:', error);
+  }
+};
+
+

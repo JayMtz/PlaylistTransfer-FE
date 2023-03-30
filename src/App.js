@@ -1,7 +1,7 @@
 import './App.css';
 import React, { useEffect, useState } from 'react';
-import { appleButton, spotifyButton } from './styles';
-import { getSpotifyTokenFromUrl, getLikedSongs, handleSpotifyAuth } from './spotifyApi';
+import { appleButton, spotifyButton} from './styles';
+import { getSpotifyTokenFromUrl, getLikedSongs, handleSpotifyAuth, createPlaylist } from './spotifyApi';
 
 function App() {
   const [isSpotifyLoggedIn, setIsSpotifyLoggedIn] = useState(false);
@@ -26,6 +26,11 @@ function App() {
     getLikedSongs(spotifyToken);
   };
 
+  const handleCreatePlaylist = () => {
+    createPlaylist(spotifyToken, 'lol test 2')
+    console.log(spotifyToken)
+  }
+
   return (
     <div className='App'>
       <div
@@ -37,13 +42,25 @@ function App() {
           alignItems: 'center',
         }}
       >
-        <button style={spotifyButton} onClick={handleSpotifyAuth}>
-          Click here to Authorize your Spotify account
+        <div style={{display: 'flex', alignItems: 'center'}}>
+          <button style={spotifyButton} onClick={handleSpotifyAuth}>
+            Click here to Authorize your Spotify account
+          </button>
+          
+           <button
+          style={appleButton}
+        >
+          Click here to authorize your Apple Music account
         </button>
+        
+        </div>
         {isSpotifyLoggedIn && (
           <div style={{ position: 'absolute', bottom: '0', width: '100%' }}>
             <button style={spotifyButton} onClick={handleGetLikedSongs}>
               get liked songs
+            </button>
+            <button style={spotifyButton} onClick = {handleCreatePlaylist} >
+              Create a playlist
             </button>
           </div>
         )}

@@ -15,12 +15,22 @@ export const spotifyButton = {
 
   export const appleButton = {
     borderRadius: '20px',
-
-      
-      backgroundColor: '#1DB954',
-        color: '#FFFFFF',
-        padding: '10px 20px',
-        fontWeight: 'bold',
-        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-        cursor: 'pointer',
+    backgroundColor: '#FF2D55',
+    color: '#FFFFFF',
+    padding: '10px 20px',
+    fontWeight: 'bold',
+    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+    cursor: 'pointer',
+    border: 'none',
+    textDecoration: 'none',
+    transition: 'background-color 0.3s ease',
+    ":hover": {
+      backgroundColor: "#FF375F",
+    },
+    ":active": {
+      backgroundColor: "#FF2D55",
+      boxShadow: 'none',
+    },
   };
+  
+  
