@@ -6,7 +6,7 @@ import { getSpotifyTokenFromUrl, getLikedSongs, handleSpotifyAuth, createPlaylis
 function App() {
   const [isSpotifyLoggedIn, setIsSpotifyLoggedIn] = useState(false);
   const [spotifyToken, setSpotifyToken] = useState(null);
-
+  const [isLoading, setIsLoading] = useState(false)
   const [tracks, setTracks] = useState([]);
 
   // This useEffect hook checks for the Spotify token in the URL when the app first loads.
@@ -23,8 +23,22 @@ function App() {
   // This function is called when the "Get Liked Songs" button is clicked.
   // It calls the getLikedSongs function with the Spotify token to retrieve the user's liked songs.
   const handleGetLikedSongs = () => {
-    getLikedSongs(spotifyToken);
+    setIsLoading(true);
+    if (spotifyToken) { // add this check
+      getLikedSongs(spotifyToken)
+        .then(() => {
+          setIsLoading(false);
+          console.log('Completed');
+        })
+        .catch((error) => {
+          setIsLoading(false);
+          console.error(error);
+        });
+    }
   };
+  
+  
+  
 
   const handleCreatePlaylist = () => {
     createPlaylist(spotifyToken, 'lol test 2')
@@ -56,12 +70,19 @@ function App() {
         </div>
         {isSpotifyLoggedIn && (
           <div style={{ position: 'absolute', bottom: '0', width: '100%' }}>
+            {isLoading ? (
+              <p>Loading..</p>
+            ) : (
+              <>
+          
             <button style={spotifyButton} onClick={handleGetLikedSongs}>
               get liked songs
             </button>
             <button style={spotifyButton} onClick = {handleCreatePlaylist} >
               Create a playlist
             </button>
+            </>
+            )}
           </div>
         )}
       </div>

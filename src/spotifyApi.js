@@ -45,12 +45,12 @@ export const getLikedSongs = (token) => {
     return tracks;
   };
   
-  // call the getAllTracks function and log the tracks to the console
-  getAllTracks()
+  // return the Promise from getAllTracks
+  return getAllTracks()
     .then((tracks) => {
       console.log(tracks); // log the tracks to the console for debugging purposes
       // send the tracks to the backend endpoint using fetch
-      fetch('https://reqres.in/api/users', {
+      return fetch('https://reqres.in/api/users', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -66,6 +66,7 @@ export const getLikedSongs = (token) => {
     })
     .catch((error) => console.log(error));
 };
+
 
 // function to create a new public playlist for the user
 // function to create a new playlist
