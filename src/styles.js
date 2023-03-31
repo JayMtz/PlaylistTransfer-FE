@@ -1,3 +1,8 @@
+import { css } from '@emotion/react';
+
+
+export const spinnerCss = css` margin: auto;`;
+
 export const spotifyButton = {
   background: '#1DB954',
   border: 'none',
@@ -15,22 +20,24 @@ export const spotifyButton = {
 
   export const appleButton = {
     borderRadius: '20px',
-    backgroundColor: '#FF2D55',
+    backgroundColor: '#ff2d55',
     color: '#FFFFFF',
     padding: '10px 20px',
     fontWeight: 'bold',
     boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
     cursor: 'pointer',
+    transition: 'background-color 0.2s ease-out',
     border: 'none',
-    textDecoration: 'none',
-    transition: 'background-color 0.3s ease',
-    ":hover": {
-      backgroundColor: "#FF375F",
-    },
-    ":active": {
-      backgroundColor: "#FF2D55",
-      boxShadow: 'none',
-    },
+    textShadow: '1px 1px 2px #5B5B5B',
+    outline: 'none',
+    fontSize: '16px',
+    fontFamily: 'Helvetica Neue,Helvetica,Arial,sans-serif',
+    letterSpacing: '1px',
+    margin: '10px',
   };
+  
+ 
+  
+  
   
   
