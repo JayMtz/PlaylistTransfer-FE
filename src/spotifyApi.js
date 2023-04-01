@@ -24,7 +24,7 @@ export const getSpotifyTokenFromUrl = () => {
 export const getLikedSongs = (token) => {
   // set the access token for the SpotifyWebApi instance
   spotifyApi.setAccessToken(token);
-  
+
   // function to get all of the user's liked tracks
   const getAllTracks = async (offset = 0) => {
     const response = await spotifyApi.getMySavedTracks({ offset });
@@ -33,7 +33,7 @@ export const getLikedSongs = (token) => {
       name: item.track.name,
       artist: item.track.artists[0].name,
     }));
-    
+
     // check if there are more tracks to get
     if (response.next) {
       // recursively get the next page of tracks
@@ -41,31 +41,37 @@ export const getLikedSongs = (token) => {
       // concatenate the current page of tracks with the next page of tracks
       return [...tracks, ...nextTracks];
     }
-  
+
     return tracks;
   };
-  
+
   // return the Promise from getAllTracks
   return getAllTracks()
     .then((tracks) => {
       console.log(tracks); // log the tracks to the console for debugging purposes
       // send the tracks to the backend endpoint using fetch
-      return fetch('https://reqres.in/api/users', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(tracks),
-      })
-        .then((response) => {
-          console.log('Data sent successfully:', response);
-        })
-        .catch((error) => {
-          console.error('Error sending data:', error);
-        });
+      fetch('http://localhost:4000/tracks', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify(tracks),
+})
+  .then((response) => {
+    console.log('Data sent successfully:', response);
+    return response.json();
+  })
+  .then((data) => {
+    console.log('Data received:', data); // <-- Log the response data to the console
+  })
+  .catch((error) => {
+    console.error('Error sending data:', error);
+  });
+
     })
     .catch((error) => console.log(error));
 };
+
 
 
 // function to create a new public playlist for the user
