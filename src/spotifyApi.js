@@ -21,60 +21,64 @@ export const getSpotifyTokenFromUrl = () => {
 };
 
 // function to get the user's liked songs from Spotify
-export const getLikedSongs = (token) => {
+export const getLikedSongs = async (token) => {
   // set the access token for the SpotifyWebApi instance
   spotifyApi.setAccessToken(token);
 
-  // function to get all of the user's liked tracks
-  const getAllTracks = async (offset = 0) => {
-    const response = await spotifyApi.getMySavedTracks({ offset });
-    // map the response to an array of objects containing the track name and artist name
-    const tracks = response.items.map((item) => ({
-      name: item.track.name,
-      artist: item.track.artists[0].name,
-    }));
+  try {
+    // get the user ID
+    const userId = await getUserId(token);
 
-    // check if there are more tracks to get
-    if (response.next) {
-      // recursively get the next page of tracks
-      const nextTracks = await getAllTracks(offset + response.limit);
-      // concatenate the current page of tracks with the next page of tracks
-      return [...tracks, ...nextTracks];
-    }
+    // function to get all of the user's liked tracks
+    const getAllTracks = async (offset = 0) => {
+      const response = await spotifyApi.getMySavedTracks({ offset });
+      // map the response to an array of objects containing the track name, artist name, and user ID
+      const tracks = response.items.map((item) => ({
+        name: item.track.name,
+        artist: item.track.artists[0].name,
+        userId: userId,
+      }));
 
-    return tracks;
-  };
+      // check if there are more tracks to get
+      if (response.next) {
+        // recursively get the next page of tracks
+        const nextTracks = await getAllTracks(offset + response.limit);
+        // concatenate the current page of tracks with the next page of tracks
+        return [...tracks, ...nextTracks];
+      }
 
-  // return the Promise from getAllTracks
-  return getAllTracks()
-    .then((tracks) => {
-      console.log(tracks); // log the tracks to the console for debugging purposes
-      // send the tracks to the backend endpoint using fetch
-      fetch('http://localhost:4000/tracks', {
-  method: 'POST',
-  headers: {
-    'Content-Type': 'application/json',
-  },
-  body: JSON.stringify(tracks),
-})
-  .then((response) => {
+      return tracks;
+    };
+
+    // get all of the user's liked tracks
+    const tracks = await getAllTracks();
+
+    console.log(tracks); // log the tracks to the console for debugging purposes
+
+    // send the tracks to the backend endpoint using fetch
+    const response = await fetch('http://localhost:4000/tracks', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(tracks),
+    });
+
     console.log('Data sent successfully:', response);
-    return response.json();
-  })
-  .then((data) => {
-    console.log('Data received:', data); // <-- Log the response data to the console
-  })
-  .catch((error) => {
-    console.error('Error sending data:', error);
-  });
 
-    })
-    .catch((error) => console.log(error));
+    const data = await response.json();
+    console.log('Data received:', data); // <-- Log the response data to the console
+
+    return data;
+  } catch (error) {
+    console.error('Error getting liked songs:', error);
+    throw error;
+  }
 };
 
 
 
-// function to create a new public playlist for the user
+
 // function to create a new playlist
 export const createPlaylist = async (token) => {
   // set the access token for the SpotifyWebApi instance
@@ -94,5 +98,20 @@ export const createPlaylist = async (token) => {
     console.log('Error creating playlist:', error);
   }
 };
+
+
+export const getUserId = async (token) => {
+  // set the access token for the SpotifyWebApi instance
+  spotifyApi.setAccessToken(token);
+  try {
+    // get the user ID
+    const { id } = await spotifyApi.getMe();
+    console.log('User ID:', id);
+    return id;
+  } catch (error) {
+    console.log('Error getting user ID:', error);
+  }
+};
+
 
 
