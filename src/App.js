@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { RingLoader } from 'react-spinners';
 
 import { appleButton, spotifyButton, spinnerCss } from './styles';
-import { getSpotifyTokenFromUrl, getLikedSongs, handleSpotifyAuth, createPlaylist } from './spotifyApi';
+import { getSpotifyTokenFromUrl, getLikedSongs, handleSpotifyAuth, createPlaylist, getUserId } from './spotifyApi';
 
 function App() {
   const [isSpotifyLoggedIn, setIsSpotifyLoggedIn] = useState(false);
@@ -42,6 +42,9 @@ function App() {
     createPlaylist(spotifyToken, 'lol test 2');
     console.log(spotifyToken);
   };
+  const handleGetUserId = () => {
+    getUserId(spotifyToken)
+  };
 
   return (
     <div className='App'>
@@ -75,6 +78,9 @@ function App() {
                 </button>
                 <button style={spotifyButton} onClick={handleCreatePlaylist}>
                   Create a playlist
+                </button>
+                <button style={spotifyButton} onClick={handleGetUserId}>
+                  userid
                 </button>
               </>
             )}

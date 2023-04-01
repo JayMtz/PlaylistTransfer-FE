@@ -7,7 +7,7 @@ export const handleSpotifyAuth = () => {
   // set up the authentication endpoint, client ID, scopes, redirect URI, and URL to open for authentication
   const authEndpoint = 'https://accounts.spotify.com/authorize';
   const clientId = '8f294d8899f94e34b7690db17fe12fc9';
-  const scopes = ['user-library-read', 'playlist-modify-public', 'playlist-modify-private'];
+  const scopes = ['user-library-read', 'playlist-modify-public', 'playlist-modify-private','user-read-private', 'user-read-email' ];
   const redirectUri = 'http://localhost:3000/callback/';
   const authUrl = `${authEndpoint}?client_id=${clientId}&redirect_uri=${redirectUri}&scope=${scopes.join('%20')}&response_type=token&show_dialog=true`;
   // open the URL to authenticate the user
@@ -85,7 +85,7 @@ export const createPlaylist = async (token) => {
   spotifyApi.setAccessToken(token);
   try {
     // get the user ID
-    const { id } = await spotifyApi.getMe();
+    const { id } = await spotifyApi.getMgete();
     console.log('User ID:', id);
     
     // create the new playlist with the name "testplaylist" and set it to be private
@@ -105,12 +105,15 @@ export const getUserId = async (token) => {
   spotifyApi.setAccessToken(token);
   try {
     // get the user ID
-    const { id } = await spotifyApi.getMe();
+    const { id } = await spotifyApi.getMe(token);
     console.log('User ID:', id);
     return id;
+    
+    
   } catch (error) {
-    console.log('Error getting user ID:', error);
+    console.log('Error creating User ID:', error);
   }
+  
 };
 
 
