@@ -56,7 +56,7 @@ export const getLikedSongs = async (token) => {
     console.log(tracks); // log the tracks to the console for debugging purposes
 
     // send the tracks to the backend endpoint using fetch
-    const response = await fetch('http://localhost:4000/tracks', {
+    const response = await fetch('http://localhost:4000/saveSongs', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
