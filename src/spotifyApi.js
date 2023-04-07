@@ -147,6 +147,7 @@ export const getDbSongs = async (token) => {
 
 
 export const uploadSongs = async (token) => {
+  console.log('uploading song...')
   try {
     // get songs from the backend API
     const data = await getDbSongs(token);
@@ -160,35 +161,59 @@ export const uploadSongs = async (token) => {
     // get the playlist ID for the "Apple Music Songs" playlist
     const playlists = await spotifyApi.getUserPlaylists(userId);
     const appleMusicPlaylist = playlists.items.find((playlist) => playlist.name === 'Apple Music Songs');
-    console.log(playlists)
+
     if (!appleMusicPlaylist) {
       console.log('Playlist not found');
       return;
     }
+
     const playlistId = appleMusicPlaylist.id;
-console.log('uploading songs...')
-    // loop until all songs are added to the "Apple Music Songs" playlist
-    let i = 0;
-    while (i < data.length) {
-      // add the next batch of tracks from the database to the "Apple Music Songs" playlist
-      const trackUris = [];
-      for (let j = 0; j < 100 && i < data.length; j++, i++) {
-        const song = data[i];
-        const track = await spotifyApi.searchTracks(`${song.artist} ${song.name}`);
-        if (track && track.tracks && track.tracks.items && track.tracks.items[0]) {
-          const trackUri = track.tracks.items[0].uri;
-          trackUris.push(trackUri);
+    const batchSize = 100;
+    const cache = new Set();
+    const trackUris = [];
+
+    for (let i = 0; i < data.length; i += batchSize) {
+      const batch = data.slice(i, i + batchSize);
+      const promises = [];
+
+      for (const song of batch) {
+        const cacheKey = `${song.artist} ${song.name}`;
+
+        if (!cache.has(cacheKey)) {
+          promises.push(spotifyApi.searchTracks(cacheKey));
         }
       }
 
-      const response = await spotifyApi.addTracksToPlaylist(playlistId, trackUris);
-      console.log('Tracks added to playlist:', response);
+      const responses = await Promise.all(promises);
+
+      for (const response of responses) {
+        if (response && response.tracks && response.tracks.items && response.tracks.items.length > 0) {
+          const trackUri = response.tracks.items[0].uri;
+          trackUris.push(trackUri);
+          const cacheKey = `${response.tracks.items[0].artists[0].name} ${response.tracks.items[0].name}`;
+          cache.add(cacheKey);
+        }
+      }
+
+      if (trackUris.length >= batchSize) {
+        const response = await spotifyApi.addTracksToPlaylist(playlistId, trackUris.slice(0, batchSize));
+        console.log(`Added ${batchSize} tracks to playlist`);
+        trackUris.splice(0, batchSize);
+      }
     }
+
+    if (trackUris.length > 0) {
+      const response = await spotifyApi.addTracksToPlaylist(playlistId, trackUris);
+      console.log(`Added ${trackUris.length} tracks to playlist`);
+    }
+
+    console.log('All tracks added to playlist');
   } catch (error) {
     console.log('Error adding tracks to playlist:', error);
   }
   console.log('done')
 };
+
 
 
 
