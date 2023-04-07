@@ -3,12 +3,13 @@ import React, { useEffect, useState } from 'react';
 import { RingLoader } from 'react-spinners';
 
 import { appleButton, spotifyButton, spinnerCss } from './styles';
-import { getSpotifyTokenFromUrl, getLikedSongs, handleSpotifyAuth, createPlaylist, getUserId } from './spotifyApi';
+import { getSpotifyTokenFromUrl, getLikedSongs, handleSpotifyAuth, createPlaylist, getUserId, uploadSongs } from './spotifyApi';
 
 function App() {
   const [isSpotifyLoggedIn, setIsSpotifyLoggedIn] = useState(false);
   const [spotifyToken, setSpotifyToken] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isPlaylistCreated, setIsPlaylistCreated] = useState(false);
 
   // This useEffect hook checks for the Spotify token in the URL when the app first loads.
   // If the token is present, it sets the token state and sets the isSpotifyLoggedIn state to true.
@@ -39,12 +40,17 @@ function App() {
   };
 
   const handleCreatePlaylist = () => {
-    createPlaylist(spotifyToken, 'lol test 2');
+    createPlaylist(spotifyToken);
+    setIsPlaylistCreated(true);
     console.log(spotifyToken);
   };
+
   const handleGetUserId = () => {
     getUserId(spotifyToken)
   };
+  const handleUploadSongs = () => {
+    uploadSongs(spotifyToken)
+  }
 
   return (
     <div className='App'>
@@ -82,13 +88,17 @@ function App() {
                 <button style={spotifyButton} onClick={handleGetUserId}>
                   userid
                 </button>
+                <button style={spotifyButton} onClick={handleUploadSongs}>
+                  upload songs
+                </button>
               </>
             )}
           </div>
         )}
       </div>
     </div>
-  );
+ 
+ );
 }
 
 export default App;

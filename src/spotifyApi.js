@@ -2,6 +2,8 @@
 import SpotifyWebApi from 'spotify-web-api-js';
 const spotifyApi = new SpotifyWebApi();
 
+
+
 // function to handle Spotify authentication
 export const handleSpotifyAuth = () => {
   // set up the authentication endpoint, client ID, scopes, redirect URI, and URL to open for authentication
@@ -77,20 +79,18 @@ export const getLikedSongs = async (token) => {
 };
 
 
-
-
 // function to create a new playlist
 export const createPlaylist = async (token) => {
   // set the access token for the SpotifyWebApi instance
   spotifyApi.setAccessToken(token);
   try {
     // get the user ID
-    const { id } = await spotifyApi.getMgete();
+    const { id } = await spotifyApi.getMe();
     console.log('User ID:', id);
     
     // create the new playlist with the name "testplaylist" and set it to be private
     const response = await spotifyApi.createPlaylist(id, {
-      name: 'Apple Music songs',
+      name: 'Apple Music Songs',
       public: false
     });
     console.log('Playlist created:', response);
@@ -105,7 +105,7 @@ export const getUserId = async (token) => {
   spotifyApi.setAccessToken(token);
   try {
     // get the user ID
-    const { id } = await spotifyApi.getMe(token);
+    const { id } = await spotifyApi.getMe();
     console.log('User ID:', id);
     return id;
     
@@ -115,6 +115,89 @@ export const getUserId = async (token) => {
   }
   
 };
+
+// Function to fetch songs from backend API
+export const getDbSongs = async (token) => {
+  // set the access token for the SpotifyWebApi instance
+  spotifyApi.setAccessToken(token);
+
+  try {
+    // get the user ID
+    
+    const userId = await getUserId(token);
+    
+
+    const response = await fetch(`http://localhost:4000/getDbSongs/${userId}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`, // <-- Include the Spotify token in the headers
+      },
+    });
+
+    const data = await response.json();
+    console.log('Data received getDbSongs', data); // <-- Log the response data to the console
+
+    return data;
+  } catch (error) {
+    console.error('Error getting songs from the database:', error);
+    throw error;
+  }
+};
+
+
+export const uploadSongs = async (token) => {
+  try {
+    // get songs from the backend API
+    const data = await getDbSongs(token);
+
+    // set the access token for the SpotifyWebApi instance
+    spotifyApi.setAccessToken(token);
+
+    // get the user ID
+    const userId = await getUserId(token);
+
+    // get the playlist ID for the "Apple Music Songs" playlist
+    const playlists = await spotifyApi.getUserPlaylists(userId);
+    const appleMusicPlaylist = playlists.items.find((playlist) => playlist.name === 'Apple Music Songs');
+    console.log(playlists)
+    if (!appleMusicPlaylist) {
+      console.log('Playlist not found');
+      return;
+    }
+    const playlistId = appleMusicPlaylist.id;
+console.log('uploading songs...')
+    // loop until all songs are added to the "Apple Music Songs" playlist
+    let i = 0;
+    while (i < data.length) {
+      // add the next batch of tracks from the database to the "Apple Music Songs" playlist
+      const trackUris = [];
+      for (let j = 0; j < 100 && i < data.length; j++, i++) {
+        const song = data[i];
+        const track = await spotifyApi.searchTracks(`${song.artist} ${song.name}`);
+        if (track && track.tracks && track.tracks.items && track.tracks.items[0]) {
+          const trackUri = track.tracks.items[0].uri;
+          trackUris.push(trackUri);
+        }
+      }
+
+      const response = await spotifyApi.addTracksToPlaylist(playlistId, trackUris);
+      console.log('Tracks added to playlist:', response);
+    }
+  } catch (error) {
+    console.log('Error adding tracks to playlist:', error);
+  }
+  console.log('done')
+};
+
+
+
+
+
+
+
+
+
 
 
 
