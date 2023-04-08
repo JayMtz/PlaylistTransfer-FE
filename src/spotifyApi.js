@@ -148,6 +148,7 @@ export const getDbSongs = async (token) => {
 
 export const uploadSongs = async (token) => {
   console.log('uploading songs...')
+
   try {
     // get songs from the backend API
     const data = await getDbSongs(token);
@@ -161,7 +162,7 @@ export const uploadSongs = async (token) => {
     // get the playlist ID for the "Apple Music Songs" playlist
     const playlists = await spotifyApi.getUserPlaylists(userId);
     const appleMusicPlaylist = playlists.items.find((playlist) => playlist.name === 'Apple Music Songs');
-  
+    console.log(playlists)
     if (!appleMusicPlaylist) {
       console.log('Playlist not found');
       return;
@@ -209,13 +210,15 @@ export const uploadSongs = async (token) => {
       await Promise.all(promises);
 
       const response = await spotifyApi.addTracksToPlaylist(playlistId, trackUris);
-      console.log('Tracks added to playlist:' + i );
+      //console.log('Tracks added to playlist:', response);
+      console.log(i)
     }
   } catch (error) {
     console.log('Error adding tracks to playlist:', error);
   }
-  console.log('done')
+  console.log('done');
 };
+
 
 
 
