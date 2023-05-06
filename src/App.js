@@ -38,7 +38,7 @@ function App() {
         });
     }
   };
-
+  
   const handleCreatePlaylist = () => {
     createPlaylist(spotifyToken);
     setIsPlaylistCreated(true);
